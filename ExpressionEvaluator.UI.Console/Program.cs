@@ -2,7 +2,7 @@
 
 try
 {
-    var result1 = Evaluator.Evaluate("10.5+20.959059509");
+    var result1 = Evaluator.Evaluate("10.2898999998989+2000");
     var result2 = Evaluator.Evaluate("2*7/4-(8-9^(1/2))+6");
     var result3 = Evaluator.Evaluate("4*(5+6-(8/2^3)-7)-1");
 

@@ -1,21 +1,35 @@
-﻿namespace ExpressionEvaluator.Core;
+﻿
+namespace ExpressionEvaluator.Core;
 
 public class Evaluator
 {
     public static double Evaluate(string infix)
     {
         var postfix = InfixToPostfix(infix);
-        return EvaluatePostfix(postfix);
+        Console.WriteLine($"Postfix: {postfix}");
+        var expression = InvestExpression(postfix);
+        Console.WriteLine($"Invest: {expression}");
+        return EvaluatePostfix(expression);
     }
 
     private static string InfixToPostfix(string infix)
     {
+        var contains = string.Empty;
+
         var postFix = string.Empty;
         var stack = new Stack<char>();
         foreach (var item in infix)
         {
             if (IsOperator(item))
             {
+
+                if (contains != string.Empty)
+                { 
+                  contains = $"[{contains}]";
+                  postFix += contains;
+                  contains = string.Empty;
+                }
+                
                 if (stack.Count == 0)
                 {
                     stack.Push(item);
@@ -43,11 +57,17 @@ public class Evaluator
                         }
                     }
                 }
+
             }
             else
             {
-                postFix += item;
+                contains += item;
             }
+        }
+        if (contains != string.Empty)
+        {
+            contains = $"[{contains}]";
+            postFix += contains;
         }
         while (stack.Count > 0)
         {
@@ -78,10 +98,55 @@ public class Evaluator
         _ => throw new Exception("Sintax error."),
     };
 
-    private static double EvaluatePostfix(string postfix)
+    private static string InvestExpression(string postfix)
     {
+        var contains = string.Empty;
+        var expression = string.Empty; 
+        var stack = new Stack<char>();
+        foreach (var item in postfix)
+        {
+            if (IsBrackets(item))
+            {
+                if (stack.Count == 0)
+                {
+                    stack.Push(item);
+                }
+                else
+                {
+                    if (item == ']')
+                    {
+                        do
+                        {
+                            contains += stack.Pop();
+                        } while (stack.Peek() != '[');
+                        stack.Pop();
+                        contains = $"[{contains}]";
+                        expression += contains;
+                        contains = string.Empty;
+                    }
+                    else
+                    {
+                        stack.Push(item);
+                    }
+
+                }
+
+            }
+            else
+            { 
+                expression += item; 
+            }
+    
+        }
+        return expression;
+    }
+
+    private static double EvaluatePostfix(string expression)
+    {
+        var contains = string.Empty;
         var stack = new Stack<double>();
-        foreach (char item in postfix)
+        var assistant = new Stack<char>();
+        foreach (var item in expression)
         {
             if (IsOperator(item))
             {
@@ -99,11 +164,35 @@ public class Evaluator
             }
             else
             {
-                stack.Push(double.Parse(item.ToString()));
+                if (assistant.Count == 0)
+                {
+                    assistant.Push(item);
+                }
+                else
+                {
+                    if (item == ']')
+                    {
+                        do
+                        {
+                            contains += assistant.Pop();
+                        } while (assistant.Peek() != '[');
+                        assistant.Pop();
+                        var number = double.Parse(contains);
+                        stack.Push(number);
+                        contains = string.Empty;
+                    }
+                    else
+                    {
+                        assistant.Push(item);
+                    }
+                }
             }
+
         }
         return stack.Pop();
     }
-
     private static bool IsOperator(char item) => "+-*/^()".Contains(item);
+
+    private static bool IsBrackets(char item) => "[]1234567890,.".Contains(item);
+
 }

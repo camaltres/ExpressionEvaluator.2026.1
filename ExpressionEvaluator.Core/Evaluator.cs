@@ -6,9 +6,7 @@ public class Evaluator
     public static double Evaluate(string infix)
     {
         var postfix = InfixToPostfix(infix);
-        Console.WriteLine($"Postfix: {postfix}");
         var expression = InvestExpression(postfix);
-        Console.WriteLine($"Invest: {expression}");
         return EvaluatePostfix(expression);
     }
 
